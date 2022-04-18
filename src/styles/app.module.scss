@@ -1,0 +1,9 @@
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    > main {
+        // width: 100%;
+        flex: 1;
+    }
+}

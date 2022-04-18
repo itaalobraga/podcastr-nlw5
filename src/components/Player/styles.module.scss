@@ -1,0 +1,113 @@
+.playerContainer {
+    background-color: var(--purple-500);
+
+    height: 100vh;
+    width: 424px;
+
+    padding: 3rem 4rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    > header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        > strong {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1rem;
+
+            color: var(--white);
+        }
+    }
+
+     > footer {
+        align-self: stretch;
+
+        &.empty {
+            opacity: 0.5;
+        }
+    }
+}
+
+.emptyPlayer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 4.3rem;
+
+    width: 100%;
+    height: 20rem;
+
+    background: linear-gradient(
+        143.8deg,
+        rgba(145, 100, 250, 0.8) 0%,
+        rgba(145, 100, 250, 0) 100%
+    );
+
+    box-sizing: border-box;
+
+    border: 1.5px dashed #9f75ff;
+    border-radius: 24px;
+
+    > strong {
+        font-family: 'Lexend', sans-serif;
+        font-size: 1rem;
+        text-align: center;
+        color: var(--white);
+    }
+}
+
+.progress {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    
+    font-size: .875rem;
+
+    > span {
+        display: inline-block;
+
+        width: 4rem;
+
+        text-align: center;
+    }
+
+    .emptySlider {
+        width: 100%;
+        height: 4px;
+
+        background-color: var(--purple-300);
+
+        border-radius: 2px;
+    }
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+
+    margin-top: 2.5rem;
+
+    > button {
+        background-color: transparent;
+        border: 0;
+
+        font-size: 0;
+
+        &.playButton {
+            width: 4rem;
+            height: 4rem;
+
+            border-radius: 1rem;
+
+            background-color: var(--purple-400);
+        }
+    }
+}
