@@ -1,20 +1,27 @@
-import { useContext, useEffect, useRef } from 'react';
-import { PlayerContext } from '../../contexts/PlayerContext';
+import { useEffect, useRef } from "react";
+import { usePlayer } from "../../contexts/PlayerContext";
 
-import styles from './styles.module.scss';
-import 'rc-slider/assets/index.css';
+import styles from "./styles.module.scss";
+import "rc-slider/assets/index.css";
 
-import Slider from 'rc-slider';
+import Slider from "rc-slider";
 
 export function Player() {
-    const { episodeList, isPlaying, currentEpisodeIndex, tooglePlay, setPlayingState } =
-        useContext(PlayerContext);
+    const {
+        episodeList,
+        isPlaying,
+        currentEpisodeIndex,
+        tooglePlay,
+        setPlayingState,
+        playPrevious,
+        playNext,
+        hasPrevious,
+        hasNext,
+    } = usePlayer();
 
     const episode = episodeList[currentEpisodeIndex];
 
     const audioRef = useRef<HTMLAudioElement>(null);
-
-    console.log('audioRef => ', audioRef);
 
     useEffect(() => {
         if (!audioRef.current) {
@@ -47,14 +54,14 @@ export function Player() {
                 </div>
             )}
 
-            <footer className={episode ? '' : styles.empty}>
+            <footer className={episode ? "" : styles.empty}>
                 <div className={styles.progress}>
                     <span>00:00</span>
                     {episode ? (
                         <Slider
-                            trackStyle={{ backgroundColor: '#04d361' }}
-                            railStyle={{ backgroundColor: '#9f75ff' }}
-                            handleStyle={{ borderColor: '#04d361', borderWidth: 4 }}
+                            trackStyle={{ backgroundColor: "#04d361" }}
+                            railStyle={{ backgroundColor: "#9f75ff" }}
+                            handleStyle={{ borderColor: "#04d361", borderWidth: 4 }}
                         />
                     ) : (
                         <div className={styles.emptySlider} />
@@ -76,7 +83,11 @@ export function Player() {
                     <button type="button" disabled={!episode}>
                         <img src="/images/player-icons/shuffle.svg" alt="Embaralhar" />
                     </button>
-                    <button type="button" disabled={!episode}>
+                    <button
+                        type="button"
+                        disabled={!episode || !hasPrevious}
+                        onClick={playPrevious}
+                    >
                         <img
                             src="/images/player-icons/play-previous.svg"
                             alt="Tocar anterior"
@@ -91,13 +102,17 @@ export function Player() {
                         <img
                             src={
                                 isPlaying
-                                    ? '/images/player-icons/pause.svg'
-                                    : '/images/player-icons/play.svg'
+                                    ? "/images/player-icons/pause.svg"
+                                    : "/images/player-icons/play.svg"
                             }
                             alt="Tocar"
                         />
                     </button>
-                    <button type="button" disabled={!episode}>
+                    <button
+                        type="button"
+                        disabled={!episode || !hasNext}
+                        onClick={playNext}
+                    >
                         <img
                             src="/images/player-icons/play-next.svg"
                             alt="Tocar próxima"

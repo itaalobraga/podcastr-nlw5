@@ -1,14 +1,15 @@
-import { GetStaticProps } from 'next';
-import Link from 'next/link'
+import { GetStaticProps } from "next";
 
-import { format, parseISO } from 'date-fns';
-import ptBR from 'date-fns';
-import { api } from '../services/api';
-import { convertDurationTimeToString } from '../utils/convertDurationTimeToString';
+import Image from "next/image";
+import Link from "next/link";
 
-import styles from './styles.module.scss';
-import { useContext } from 'react';
-import { PlayerContext } from '../contexts/PlayerContext';
+import { format, parseISO } from "date-fns";
+import ptBR from "date-fns";
+import { api } from "../services/api";
+import { convertDurationTimeToString } from "../utils/convertDurationTimeToString";
+
+import styles from "./styles.module.scss";
+import { usePlayer } from "../contexts/PlayerContext";
 
 type Episode = {
     id: string;
@@ -27,14 +28,16 @@ type HomeProps = {
 };
 
 export default function Home({ lastestEpisodes, allEpisodes }: HomeProps) {
-    const { play } = useContext(PlayerContext)
+    const { playList } = usePlayer();
+
+    const episodeList = [...lastestEpisodes, ...allEpisodes];
 
     return (
         <div className={styles.homePage}>
             <section className={styles.lastestEpisodes}>
                 <h2>Últimos lançamentos</h2>
                 <ul>
-                    {lastestEpisodes.map((episode) => (
+                    {lastestEpisodes.map((episode, index) => (
                         <li key={episode.id}>
                             <img src={episode.thumbnail} alt={episode.title} />
                             <div className={styles.episodeDetails}>
@@ -46,7 +49,10 @@ export default function Home({ lastestEpisodes, allEpisodes }: HomeProps) {
                                 <span>{episode.durationAsString}</span>
                             </div>
 
-                            <button type="button" onClick={() => play(episode)}>
+                            <button
+                                type="button"
+                                onClick={() => playList(episodeList, index)}
+                            >
                                 <img src="/images/play_arrow.png" alt="Tocar" />
                             </button>
                         </li>
@@ -66,7 +72,7 @@ export default function Home({ lastestEpisodes, allEpisodes }: HomeProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {allEpisodes.map((episode) => (
+                        {allEpisodes.map((episode, index) => (
                             <tr key={episode.id}>
                                 <td>
                                     <img src={episode.thumbnail} alt="" />
@@ -75,11 +81,25 @@ export default function Home({ lastestEpisodes, allEpisodes }: HomeProps) {
                                     </Link>
                                 </td>
                                 <td>{episode.members}</td>
-                                <td style={{ width: '100px' }}>{episode.publishedAt}</td>
+                                <td style={{ width: "100px" }}>{episode.publishedAt}</td>
                                 <td>{episode.durationAsString}</td>
                                 <td>
-                                    <button type="button">
-                                        <img src="/images/play_arrow.png" alt="Tocar" />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            playList(
+                                                episodeList,
+                                                index + lastestEpisodes.length
+                                            )
+                                        }
+                                    >
+                                        <Image
+                                            src="/images/play_arrow.png"
+                                            alt="Tocar"
+                                            width={20}
+                                            height={20}
+                                            objectFit="cover"
+                                        />
                                     </button>
                                 </td>
                             </tr>
@@ -92,11 +112,11 @@ export default function Home({ lastestEpisodes, allEpisodes }: HomeProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-    const { data } = await api('episodes', {
+    const { data } = await api("episodes", {
         params: {
             _limit: 12,
-            _sort: 'published_at',
-            _order: 'desc',
+            _sort: "published_at",
+            _order: "desc",
         },
     });
 
@@ -106,7 +126,7 @@ export const getStaticProps: GetStaticProps = async () => {
             title: episode.title,
             members: episode.members,
             thumbnail: episode.thumbnail,
-            publishedAt: format(parseISO(episode.published_at), 'd MMM yy', {
+            publishedAt: format(parseISO(episode.published_at), "d MMM yy", {
                 locale: ptBR,
             }),
             duration: Number(episode.file.duration),

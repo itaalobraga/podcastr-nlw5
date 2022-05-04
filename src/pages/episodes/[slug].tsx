@@ -1,13 +1,15 @@
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-import { api } from '../../services/api';
-import { convertDurationTimeToString } from '../../utils/convertDurationTimeToString';
+import { api } from "../../services/api";
+import { convertDurationTimeToString } from "../../utils/convertDurationTimeToString";
 
-import { GetStaticPaths, GetStaticProps } from 'next';
-import Link from 'next/link';
+import { GetStaticPaths, GetStaticProps } from "next";
+import Link from "next/link";
+import Image from "next/image";
 
-import styles from './styles.module.scss';
+import styles from "./styles.module.scss";
+import { usePlayer } from "../../contexts/PlayerContext";
 
 type Episode = {
     id: string;
@@ -26,17 +28,39 @@ type EpisodeProps = {
 };
 
 export default function Episode({ episode }: EpisodeProps) {
+    const { play } = usePlayer();
+
     return (
         <div className={styles.episode}>
             <div className={styles.thumbnailContainer}>
-                <Link href={'/'}>
-                    <button type="button">
-                        <img src="/images/arrow-left.png" alt="Voltar" />
-                    </button>
-                </Link>
-                <img src={episode.thumbnail} alt="" />
                 <button type="button">
-                    <img src="/images/arrow-right.png" alt="Tocar episódio" />
+                    <Link href={"/"} passHref>
+                        <a>
+                            <Image
+                                src="/images/arrow-left.png"
+                                alt="Voltar"
+                                width={40}
+                                height={40}
+                            />
+                        </a>
+                    </Link>
+                </button>
+                <div>
+                    <Image
+                        src={episode.thumbnail}
+                        alt="Thumbnail do Episódio"
+                        layout="fill"
+                        objectFit="cover"
+                        style={{ borderRadius: "1rem" }}
+                    />
+                </div>
+                <button type="button" onClick={() => play(episode)}>
+                    <Image
+                        src="/images/arrow-right.png"
+                        alt="Tocar"
+                        width={24}
+                        height={24}
+                    />
                 </button>
             </div>
             <header>
@@ -54,25 +78,25 @@ export default function Episode({ episode }: EpisodeProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const { data } = await api('episodes', {
+    const { data } = await api("episodes", {
         params: {
             _limit: 2,
-            _sort: 'published_at',
-            _order: 'desc',
+            _sort: "published_at",
+            _order: "desc",
         },
     });
 
-    const paths = data.map(episode => {
+    const paths = data.map((episode) => {
         return {
             params: {
-                slug: episode.id
-            }
-        }
-    })
+                slug: episode.id,
+            },
+        };
+    });
 
     return {
         paths,
-        fallback: 'blocking',
+        fallback: "blocking",
     };
 };
 
@@ -86,7 +110,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         title: data.title,
         members: data.members,
         thumbnail: data.thumbnail,
-        publishedAt: format(parseISO(data.published_at), 'd MMM yy', {
+        publishedAt: format(parseISO(data.published_at), "d MMM yy", {
             locale: ptBR,
         }),
         duration: Number(data.file.duration),
